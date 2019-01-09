@@ -21,14 +21,15 @@ int max_ele(vector<int>& a)
 }
 
 /* load the data set */
-vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user, int& num_story)
+vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user, int& num_item)
 {
   // read in reading list with temporal information
   ifstream infile;
   infile.open(file_name);
   if (!infile)
   {
-    printf("File Does Not Exist!!!");
+    cout << "File Does Not Exist!!!" << endl;
+    exit(0);
   }
   int uid;
   int sid;
@@ -42,7 +43,7 @@ vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user,
   unordered_map<string, int> item2id;
 
   num_user = 0;
-  num_story = 0;
+  num_item = 0;
 
   // read from .csv file
   string delimiter = ",";
@@ -64,7 +65,7 @@ vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user,
     
     if (item2id.find(item) == item2id.end())
     {
-      item2id[item] = num_story++;
+      item2id[item] = num_item++;
     }
     
     if (user2id.find(user) == user2id.end())
@@ -95,9 +96,9 @@ vector<unordered_map<int, T> > transpose(vector<unordered_map<int, T> >& R, int 
 
   for (int i = 0; i < nrows; ++i)
   {
-    for (auto it = R[i].begin(); it != R[i].end(); ++it)
+    for (const auto &it : R[i])
     {
-      result[it->first][i] = it->second;
+      result[it.first][i] = it.second;
     }
   }
 
@@ -105,14 +106,14 @@ vector<unordered_map<int, T> > transpose(vector<unordered_map<int, T> >& R, int 
 }
 
 /* take out the last item as test/validation set */
-vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_map<int, int> >& R_story)
+vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_map<int, int> >& R_item)
 {
   int num_users = R.size();
   vector<int> leave_out_list(num_users);
   
   for (int i = 0; i < num_users; ++i)
   {
-    vector<int> latest_story_list;
+    vector<int> latest_item_list;
     int latest_time = 0;
     
     /* find the latest time */
@@ -129,14 +130,14 @@ vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_
     {
       if (it.second == latest_time)
       {
-        latest_story_list.push_back(it.first);
+        latest_item_list.push_back(it.first);
       }
     }
     
-    auto random_it = std::next(begin(latest_story_list), rand_between(0, latest_story_list.size() - 1));
+    auto random_it = std::next(begin(latest_item_list), rand_between(0, latest_item_list.size() - 1));
     leave_out_list[i] = *random_it;
     R[i].erase(*random_it);
-    R_story[*random_it].erase(i);
+    R_item[*random_it].erase(i);
   }
   
   return leave_out_list;
@@ -144,7 +145,7 @@ vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_
 
 int main(int argc, const char * argv[]) {
   int num_user = 0;
-  int num_story = 0;
+  int num_item = 0;
   srand(1);
   
   const char * train_file_name = argv[1];
@@ -162,13 +163,13 @@ int main(int argc, const char * argv[]) {
   double tol = (double)atof(argv[6]);
   
   cout << "Program Start!" << endl;
-  vector<unordered_map<int, int> > R_user = load_data(train_file_name, num_user, num_story);
-  vector<unordered_map<int, int> > R_item = transpose(R_user, num_user, num_story);
+  vector<unordered_map<int, int> > R_user = load_data(train_file_name, num_user, num_item);
+  vector<unordered_map<int, int> > R_item = transpose(R_user, num_user, num_item);
   cout << "Training data loaded!" << endl;
   
   vector<int> leave_out_list = leave_one_out(R_user, R_item);
   
-  PureSlim m(num_story, num_user);
+  PureSlim m(num_item, num_user);
   
   m.train(R_item, lambda_1, lambda_2, p, tol);
   

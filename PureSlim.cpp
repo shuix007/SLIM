@@ -16,9 +16,9 @@ double PureSlim::ip_tp(const unordered_map<int, int>& reg, const unordered_map<i
 {
   double ans = 0.;
   
-  for (auto it = reg.begin(); it != reg.end(); ++it)
+  for (const auto &it : reg)
   {
-    if (tar.find(it->first) != tar.end())
+    if (tar.find(it.first) != tar.end())
     {
       ans += 1.;
     }
@@ -31,9 +31,9 @@ void PureSlim::add_hat_tp(const unordered_map<int, int>& rl, double weight, vect
 {
   if (weight > 0)
   {
-    for (auto it = rl.begin(); it != rl.end(); ++it)
+    for (const auto &it : rl)
     {
-      y_hat[it->first] += weight;
+      y_hat[it.first] += weight;
     }
   }
 }
@@ -43,9 +43,9 @@ void PureSlim::subtract_hat_tp(const unordered_map<int, int>& rl, double weight,
 {
   if (weight > 0)
   {
-    for (auto it = rl.begin(); it != rl.end(); ++it)
+    for (const auto &it : rl)
     {
-      y_hat[it->first] -= weight;
+      y_hat[it.first] -= weight;
     }
   }
 }
@@ -54,9 +54,9 @@ double PureSlim::ip_faster_tp(const unordered_map<int, int>& rl, vector<double>&
 {
   double ans = 0.;
   
-  for (auto it = rl.begin(); it != rl.end(); ++it)
+  for (const auto &it : rl)
   {
-    ans += y_hat[it->first];
+    ans += y_hat[it.first];
   }
   
   return ans;
@@ -68,9 +68,9 @@ unordered_map<int, double> PureSlim::norm_tp_x(const vector<unordered_map<int, i
   unordered_map<int, double> norm;
   norm.reserve(n);
   
-  for (auto it = xy_product.begin(); it != xy_product.end(); ++it)
+  for (const auto &it : xy_product)
   {
-    norm[it->first] = (double)R[it->first].size();
+    norm[it.first] = (double)R[it.first].size();
   }
   
   return norm;
@@ -111,13 +111,13 @@ void PureSlim::train_slim(const vector<unordered_map<int, int> >& R, vector<doub
   for (int t = 0; t < T; ++t)
   {
     double delta_weight = 0.;
-    for (auto it = xy_product.begin(); it != xy_product.end(); ++it)
+    for (const auto &it : xy_product)
     {
-      int i = it->first;
+      int i = it.first;
       double tp_weight = w[i];
       
       subtract_hat_tp(R[i], tp_weight, y_hat);
-      double upper = it->second - ip_faster_tp(R[i], y_hat);
+      double upper = it.second - ip_faster_tp(R[i], y_hat);
       
       /* Eq(5) in Regularization Paths for Generalized Linear Models via Coordinate Descent */
       w[i] = upper > l1 ? (upper - l1) / (x_norm[i] + l2) : 0.;
@@ -174,9 +174,9 @@ void PureSlim::train(const vector<unordered_map<int, int> >& R, double l1, doubl
   
   for (int i = 0; i < nCol; ++i)
   {
-    for (auto it = wt[i].begin(); it != wt[i].end(); ++it)
+    for (const auto &it : wt[i])
     {
-      wtItem[it->first][i] = it->second;
+      wtItem[it.first][i] = it.second;
     }
   }
   
@@ -254,11 +254,11 @@ vector<double> PureSlim::predict_score(const unordered_map<int, int>& R_test)
 {
   vector<double> score(nItem, 0.);
   
-  for (auto it = R_test.begin(); it != R_test.end(); ++it)
+  for (const auto &it : R_test)
   {
-    for (auto inner_it = wtItem[it->first].begin(); inner_it != wtItem[it->first].end(); ++inner_it)
+    for (const auto &inner_it : wtItem[it.first])
     {
-      score[inner_it->first] += inner_it->second;
+      score[inner_it.first] += inner_it.second;
     }
   }
   
@@ -320,10 +320,10 @@ void PureSlim::write_weight(const char* filenameItem)
   
   for (int i = 0; i < nItem; ++i)
   {
-    for (auto it = wtItem[i].begin(); it != wtItem[i].end(); ++it)
+    for (const auto &it : wtItem[i])
     {
-      myfile << to_string(i) << "," << to_string(it->first) << ","
-      << to_string(it->second) << "\n";
+      myfile << to_string(i) << "," << to_string(it.first) << ","
+      << to_string(it.second) << "\n";
     }
   }
   myfile.close();
