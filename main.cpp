@@ -143,7 +143,8 @@ vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_
   return leave_out_list;
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char * argv[]) 
+{
   int num_user = 0;
   int num_item = 0;
   srand(1);
@@ -177,9 +178,12 @@ int main(int argc, const char * argv[]) {
   vector<vector<int> > rec_list = m.predict(R_user, n, p);
   double HR = 0.;
   double AR = 0.;
-  for (int i = 0; i < num_user; ++i) {
-    for (int j = 0; j < n; ++j) {
-      if (rec_list[i][j] == leave_out_list[i]) {
+  for (int i = 0; i < num_user; ++i) 
+  {
+    for (int j = 0; j < n; ++j) 
+    {
+      if (rec_list[i][j] == leave_out_list[i]) 
+      {
         HR += 1.;
         AR += 1. / (j + 1);
       }
