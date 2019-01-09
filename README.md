@@ -22,7 +22,7 @@ Ning, Xia, and George Karypis. "Slim: Sparse linear methods for top-n recommende
 - <code>eps</code>: number to control the convergence of the model
 
 # Data format
-The dataset shoud have three columns and be formated as 
+The program treats each interaction as implicit feedback. The dataset shoud have three columns and be formated as 
 
 > user_id, item_id, timestamp
 
