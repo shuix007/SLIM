@@ -25,3 +25,5 @@ Ning, Xia, and George Karypis. "Slim: Sparse linear methods for top-n recommende
 The dataset shoud have three columns and be formated as 
 
 > user_id, item_id, timestamp
+
+A sample dataset amazon_game_5.csv is uploaded.
