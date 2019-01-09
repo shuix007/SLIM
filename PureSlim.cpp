@@ -79,7 +79,7 @@ unordered_map<int, double> PureSlim::norm_tp_x(const vector<unordered_map<int, i
 
 void PureSlim::train_slim(const vector<unordered_map<int, int> >& R, vector<double>& w, int y, double l1, double l2, double tol)
 {
-  int T = 5;
+  int T = 50;
   int nCol = R.size();
   int nRow = nUser;
   
