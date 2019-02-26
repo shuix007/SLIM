@@ -2,18 +2,14 @@
 
 using namespace std;
 
-inline int rand_between(int min, int max)
-{
+inline int rand_between(int min, int max) {
   return (int)(rand() % (max - min + 1) + min);
 }
 
-int max_ele(vector<int>& a)
-{
+int max_ele(vector<int>& a) {
   int m = 0;
-  for (const auto &it : a)
-  {
-    if (it > m)
-    {
+  for (const auto &it : a) {
+    if (it > m) {
       m = it;
     }
   }
@@ -21,13 +17,11 @@ int max_ele(vector<int>& a)
 }
 
 /* load the data set */
-vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user, int& num_item)
-{
+vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user, int& num_item) {
   // read in reading list with temporal information
   ifstream infile;
   infile.open(file_name);
-  if (!infile)
-  {
+  if (!infile) {
     cout << "File Does Not Exist!!!" << endl;
     exit(0);
   }
@@ -48,8 +42,7 @@ vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user,
   // read from .csv file
   string delimiter = ",";
   string value;
-  while (getline(infile, value))
-  {
+  while (getline(infile, value)) {
     int pos = 0;
     string token;
 
@@ -63,13 +56,11 @@ vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user,
 
     t = (int)stoi(value);
     
-    if (item2id.find(item) == item2id.end())
-    {
+    if (item2id.find(item) == item2id.end()) {
       item2id[item] = num_item++;
     }
     
-    if (user2id.find(user) == user2id.end())
-    {
+    if (user2id.find(user) == user2id.end()) {
       user2id[user] = num_user++;
       unordered_map<int, int> tp_doc;
       points.push_back(tp_doc);
@@ -85,19 +76,15 @@ vector<unordered_map<int, int> > load_data(const char* file_name, int& num_user,
 }
 
 template <class T>
-vector<unordered_map<int, T> > transpose(vector<unordered_map<int, T> >& R, int nrows, int ncols)
-{
-  if ((int)R.size() != nrows)
-  {
+vector<unordered_map<int, T> > transpose(vector<unordered_map<int, T> >& R, int nrows, int ncols) {
+  if ((int)R.size() != nrows) {
     cout << "Dim not fit!" << endl;
     exit(0);
   }
   vector<unordered_map<int, T> > result(ncols);
 
-  for (int i = 0; i < nrows; ++i)
-  {
-    for (const auto &it : R[i])
-    {
+  for (int i = 0; i < nrows; ++i) {
+    for (const auto &it : R[i]) {
       result[it.first][i] = it.second;
     }
   }
@@ -106,30 +93,24 @@ vector<unordered_map<int, T> > transpose(vector<unordered_map<int, T> >& R, int 
 }
 
 /* take out the last item as test/validation set */
-vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_map<int, int> >& R_item)
-{
+vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_map<int, int> >& R_item) {
   int num_users = R.size();
   vector<int> leave_out_list(num_users);
   
-  for (int i = 0; i < num_users; ++i)
-  {
+  for (int i = 0; i < num_users; ++i) {
     vector<int> latest_item_list;
     int latest_time = 0;
     
     /* find the latest time */
-    for (const auto &it : R[i])
-    {
-      if (it.second > latest_time)
-      {
+    for (const auto &it : R[i]) {
+      if (it.second > latest_time) {
         latest_time = it.second;
       }
     }
     
     /* find the latest item */
-    for (const auto &it : R[i])
-    {
-      if (it.second == latest_time)
-      {
+    for (const auto &it : R[i]) {
+      if (it.second == latest_time) {
         latest_item_list.push_back(it.first);
       }
     }
@@ -143,8 +124,7 @@ vector<int> leave_one_out(vector<unordered_map<int, int> >& R, vector<unordered_
   return leave_out_list;
 }
 
-int main(int argc, const char * argv[]) 
-{
+int main(int argc, const char * argv[]) {
   int num_user = 0;
   int num_item = 0;
   srand(1);
@@ -172,18 +152,15 @@ int main(int argc, const char * argv[])
   
   PureSlim m(num_item, num_user);
   
-  m.train(R_item, lambda_1, lambda_2, p, tol);
+  m.train(R_item, lambda_1, lambda_2, tol, p);
   
   /* evaluate the performance of the model */
   vector<vector<int> > rec_list = m.predict(R_user, n, p);
   double HR = 0.;
   double AR = 0.;
-  for (int i = 0; i < num_user; ++i) 
-  {
-    for (int j = 0; j < n; ++j) 
-    {
-      if (rec_list[i][j] == leave_out_list[i]) 
-      {
+  for (int i = 0; i < num_user; ++i) {
+    for (int j = 0; j < n; ++j) {
+      if (rec_list[i][j] == leave_out_list[i]) {
         HR += 1.;
         AR += 1. / (j + 1);
       }

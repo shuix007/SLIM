@@ -17,8 +17,7 @@
 
 using namespace std;
 
-class PureSlim
-{
+class PureSlim {
 public:
   int nItem;
   int nUser;
@@ -36,7 +35,7 @@ public:
   void add_hat_tp(const unordered_map<int, int>& rl, double weight, vector<double>& y_hat);
   void subtract_hat_tp(const unordered_map<int, int>& rl, double weight, vector<double>& y_hat);
   double ip_faster_tp(const unordered_map<int, int>& rl, vector<double>& y_hat);
-  unordered_map<int, double> norm_tp_x(const vector<unordered_map<int, int> >& R, unordered_map<int, double>& xy_product);
+  unordered_map<int, double> norm_tp_x(const vector<unordered_map<int, int> >& R, vector<pair<int, double> >& active_items);
   
   /* train one elastic net model (coordinate descent)*/
   void train_slim(const vector<unordered_map<int, int> >& R, vector<double>& w, int y, double l1, double l2, double tol);
